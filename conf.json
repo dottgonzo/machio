@@ -1,0 +1,16 @@
+{
+
+  "app":{
+    "port":8080,
+    "gpioswitch":[
+      {
+        "pin":17,
+        "direction":"out",
+        "normal":true,
+        "group":"gpio"
+      }
+    ]
+  },
+  "io":"http://localhost:9090"
+
+}
