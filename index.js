@@ -16,7 +16,11 @@ if(!pathExists.sync(__dirname+'/db')){
 var express = require('express'),
 app     = express(),
 PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
+var GPIOsw=require('gpio-switcher');
+if(conf.gpioswitch){
+  var G=new GPIOsw()
 
+}
 app.use('/db', require('express-pouchdb')(PouchDB));
 var configdb=new PouchDB('settings');
 
