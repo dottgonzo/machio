@@ -24,7 +24,7 @@ app.locals={
 
 app.use('/db', require('express-pouchdb')(PouchDB));
 
-app.use('/switches', GPIOapp);
+app.use('/switches', GPIOapp('oo'));
 
 
 var configdb=new PouchDB('settings');
