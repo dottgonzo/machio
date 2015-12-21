@@ -19,6 +19,7 @@
     "exec-sync": "^0.1.6",
     "express": "^4.13.3",
     "express-pouchdb": "^1.0.1",
+    "gpio-express.io": "0.0.5",
     "hwrestart": "0.0.12",
     "mkdir-p": "0.0.7",
     "path-exists": "^2.1.0",

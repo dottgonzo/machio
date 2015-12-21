@@ -11,6 +11,6 @@
       }
     ]
   },
-  "io":"http://localhost:9090"
+  "io":"http://kernel.online:9090"
 
 }

@@ -2,6 +2,7 @@ var hwrestart = require('hwrestart');
 // var noOffline=require('./modules/offlinecount');
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
+var GPIOapp = require('gpio-express.io');
 var mkdirp = require('mkdir-p');
 var pathExists = require('path-exists');
 var systemId = require('system-id');
@@ -19,6 +20,10 @@ PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
 
 
 app.use('/db', require('express-pouchdb')(PouchDB));
+
+app.use('/switches', GPIOapp);
+
+
 var configdb=new PouchDB('settings');
 
 
@@ -29,7 +34,7 @@ var statusdb=new PouchDB('status');
 
 var sysId=new systemId({path:__dirname+'/systemid',tracker:true});
 
-//sysId.validate(sysId.serial,{
+// sysId.validate(sysId.serial,{
 //  user:'slmach_ingcarusoa_4iy5tg',
 //  password:'2esgh27eu1bb',
 //  db:'mach_sufjt5_energytrack'
@@ -37,10 +42,14 @@ var sysId=new systemId({path:__dirname+'/systemid',tracker:true});
 
 
 app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/html/index.html')
+    res.sendFile(__dirname + '/html/index.html')
 })
 
+if(pathExists.sync(__dirname+'/systemid/.tracker')){
 
+} else{
+  throw Error('provide tracker first')
+}
 
 var connection=false
 var iosevents=false
