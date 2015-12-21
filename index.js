@@ -18,6 +18,9 @@ var express = require('express'),
 app     = express(),
 PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
 
+app.locals={
+  ciao:'bao'
+}
 
 app.use('/db', require('express-pouchdb')(PouchDB));
 
