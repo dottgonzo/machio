@@ -1,5 +1,5 @@
 var hwrestart = require('hwrestart');
-var noOffline=require('./modules/offlinecount');
+// var noOffline=require('./modules/offlinecount');
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
 var mkdirp = require('mkdir-p');
@@ -16,11 +16,8 @@ if(!pathExists.sync(__dirname+'/db')){
 var express = require('express'),
 app     = express(),
 PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
-var GPIOsw=require('gpio-switcher');
-if(conf.gpioswitch){
-  var G=new GPIOsw()
 
-}
+
 app.use('/db', require('express-pouchdb')(PouchDB));
 var configdb=new PouchDB('settings');
 
@@ -39,67 +36,9 @@ var sysId=new systemId({path:__dirname+'/systemid',tracker:true});
 // }) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!to be removed
 
 
-
-app.get('/switch/', function (req, res) {
-res.json(req.params)
-console.log(data);
-G.set({
-  pin:17,
-  direction:'out',
-  normal:true,
-  group:'gpio'
-}).then(function(a){
-  console.log('set')
-  G.switch(data).then(function(a){
-    console.log('switch')
-    G.unset(17).then(function(a){
-      console.log('ok')
-    }).catch(function(err){
-      console.log(err)
-    })
-  }).catch(function(err){
-    console.log(err)
-  })
-}).catch(function(err){
-  console.log(err)
-
+app.get('/', function(req, res) {
+    res.sendfile(__dirname + '/html/index.html')
 })
-
-});
-
-app.get('/switch/:pin/:val', function (req, res) {
-res.json(req.params)
-
-    console.log(data);
-
-    for(var t=0;t<conf.gpioswitch.length;t++){
-      if(req.params.pin==conf.gpioswitch[t].pin){
-        G.set(conf.gpioswitch[t]).then(function(a){
-          console.log('set')
-          G.switch(req.params.pin,req.params.val).then(function(a){
-            console.log('switch')
-            G.unset(req.params.pin).then(function(a){
-              console.log('ok')
-            }).catch(function(err){
-              console.log(err)
-            })
-          }).catch(function(err){
-            console.log(err)
-          })
-        }).catch(function(err){
-          console.log(err)
-
-        })
-
-      }
-    }
-
-
-
-
-
-});
-
 
 
 
@@ -107,6 +46,8 @@ var connection=false
 var iosevents=false
 
   function reconnect(url,auth){
+
+
     console.log('trying to connect')
     iologin(url,auth).then(function(token){
 
