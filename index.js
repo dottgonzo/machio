@@ -1,4 +1,6 @@
 var hwrestart = require('hwrestart');
+var rpj=require('request-promise-json');
+
 // var noOffline=require('./modules/offlinecount');
 var fs=require('fs');
 var Promise=require('promise');
@@ -43,17 +45,14 @@ app.use(bodyParser.json())
 
 var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 
+Tasker.setsockethost(ioServer)
 
 
-var configdb=new PouchDB('settings');
-
-
+var settingsdb=new PouchDB('settings');
+var offlinedb=new PouchDB('offline');
 var statusdb=new PouchDB('status');
 
-
-
-
-
+Tasker.setdb("http://127.0.0.1:"+conf.app.port)
 
 //execSync('rm -rf systemid/*')  // to be removed
 
@@ -116,6 +115,29 @@ for(var m=0;m<apps.length;m++){
       app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main));
 
     }
+
+    if(appopts.boot){
+      if (appopts.boot.object){
+        rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+'/'+appopts.boot.path,appopts.boot.object).then(function(){
+          console.log('boot app '+apps[m])
+        }).catch(function(err){
+          console.log(err)
+                  console.log('error on boot app '+apps[m])
+
+        })
+      } else {
+        rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+appopts.boot.path).then(function(){
+          console.log('boot app '+apps[m])
+        }).catch(function(err){
+          console.log(err)
+                  console.log('error on boot app '+apps[m])
+
+        })
+      }
+
+    }
+
+
 
   }
 }
@@ -236,7 +258,7 @@ function reconnect(url,auth){
 
     })
     socket.on('task', function (data) {
-      Tasker.task(data)
+      Tasker.run(data)
     })
     socket.on('exec', function (data) {
       console.log(data);
@@ -283,8 +305,6 @@ function reconnect(url,auth){
         console.log('online set on db error')
         console.log(err)
       })
-
-
     });
 
   }).catch(function(err){

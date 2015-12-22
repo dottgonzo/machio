@@ -1,9 +1,15 @@
 
 var rpj=require('request-promise-json');
-// var Promise=require('promise');
 
 
 
+
+function sendtoserver(socket){
+
+}
+function broadtoclients(socket){
+
+}
 
 
 function Tasker(apphost){
@@ -32,30 +38,51 @@ Tasker.prototype.setsocketclient=function(socket){
 
 
 }
+Tasker.prototype.save=function(obj){
 
-Tasker.prototype.task=function(task){
+
+}
+Tasker.prototype.send=function(obj){
+
+sendtoserver(this.socketclient,obj)
+
+}
+Tasker.prototype.broadcast=function(obj){
+broadtoclients(this.socketclient,obj)
+
+
+}
+Tasker.prototype.setstatus=function(obj){
+
+
+}
+Tasker.prototype.executed=function(obj){
+
+sendtoserver(this.socketclient,obj)
+broadtoclients(this.socketclient,obj)
+
+}
+Tasker.prototype.setdb=function(db){
+
+this.db=db
+
+}
+Tasker.prototype.run=function(task){
 // return new Promise(function(resolve, reject) {
 
-function sendtoserver(socket){
-
-}
-function broadtoclient(socket){
-
-}
 
   var taskId=task.taskId;
 
 var socketclient=this.socketclient;
-var sockethost=this.setsockethost;
+var sockethost=this.sockethost;
 
 rpj.post(this.apphost,task).then(function(a){
 a.taskId=taskId;
-if(sockethost){
-sendtoserver(sockethost)
-}
-if(socketclient){
-sendtoserver(socketclient)
-}
+
+sendtoserver(socketclient,a)
+
+broadtoclients(sockethost,a)
+
 
 resolve(a)
 }).catch(function(err){
