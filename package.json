@@ -16,6 +16,7 @@
     "url": "https://github.com/dottgonzo/machio/issues"
   },
   "dependencies": {
+    "body-parser": "^1.14.2",
     "cors": "^2.7.1",
     "exec-sync": "^0.1.6",
     "express": "^4.13.3",

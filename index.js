@@ -2,7 +2,7 @@ var hwrestart = require('hwrestart');
 // var noOffline=require('./modules/offlinecount');
 var fs=require('fs');
 var Promise=require('promise');
-
+var bodyParser = require('body-parser');
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
 var tasker=require('./modules/tasker');
@@ -30,11 +30,18 @@ var server = http.createServer(app);
 var ioServer  = require('socket.io').listen(server);
 
 
-var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 
 
 
 app.use('/db', require('express-pouchdb')(PouchDB));
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+
+var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 
 
 
