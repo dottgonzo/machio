@@ -1,9 +1,10 @@
 var hwrestart = require('hwrestart');
 // var noOffline=require('./modules/offlinecount');
+var fs=require('fs');
+
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
 var tasker=require('./modules/tasker');
-var GPIOapp = require('gpio-express.io');
 var cors = require('cors');
 var mkdirp = require('mkdir-p');
 var pathExists = require('path-exists');
@@ -30,15 +31,18 @@ var ioServer  = require('socket.io').listen(server);
 
 var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 
+
+
 app.use('/db', require('express-pouchdb')(PouchDB));
 
-app.use('/switches', GPIOapp('oo'));
 
 
 var configdb=new PouchDB('settings');
 
 
 var statusdb=new PouchDB('status');
+
+
 
 
 
@@ -55,7 +59,7 @@ var sysId=new systemId({path:__dirname+'/systemid',tracker:true});
 
 
 app.get('/', function(req, res) {
-    res.sendFile(__dirname + '/html/index.html')
+  res.sendFile(__dirname + '/html/index.html')
 })
 
 if(pathExists.sync(__dirname+'/systemid/.tracker')){
@@ -64,14 +68,74 @@ if(pathExists.sync(__dirname+'/systemid/.tracker')){
   throw Error('provide tracker first')
 }
 
+
+
+
+
+if(!pathExists.sync(__dirname+'/apps')){
+  mkdirp.sync(__dirname+'/apps')
+  mkdirp.sync(__dirname+'/apps/configs')
+  mkdirp.sync(__dirname+'/apps/modules')
+
+} else {
+
+  if(!pathExists.sync(__dirname+'/apps/configs')){
+    mkdirp.sync(__dirname+'/apps/configs')
+
+  }
+  if(!pathExists.sync(__dirname+'/apps/modules')){
+    mkdirp.sync(__dirname+'/apps/modules')
+
+  }
+}
+
+var apps=fs.readdirSync('./apps/modules/')
+for(var m=0;m<apps.length;m++){
+if(pathExists.sync(__dirname+'/apps/modules/'+apps[m]+'/package.json')){
+  var appconf=require(__dirname+'/apps/modules/'+apps[m]+'/package.json')
+
+
+
+console.log('configuring app '+appconf.name)
+
+
+if(pathExists.sync(__dirname+'/apps/configs/'+apps[m]+'.json')){
+  var appopts=require(__dirname+'/apps/configs/'+apps[m]+'.json')
+
+  app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main)(appopts.options));
+
+  } else{
+     app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main));
+
+  }
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var connection=false
 var iosevents=false
 
-  function reconnect(url,auth){
+function reconnect(url,auth){
 
 
-    console.log('trying to connect')
-    iologin(url,auth).then(function(token){
+  console.log('trying to connect')
+  iologin(url,auth).then(function(token){
 
     var socket = ioClient.connect(url, {
       'query': 'token=' + token
@@ -133,8 +197,8 @@ var iosevents=false
       },5000)
     });
 
-    }).catch(function(err){
-      console.log('wrooong')
+  }).catch(function(err){
+    console.log('wrooong')
 
     console.log(err)
     setTimeout(function(){
@@ -148,7 +212,7 @@ var iosevents=false
     },10000)
 
   })
-  }
+}
 reconnect(conf.io,sysId.auth())
 
 server.listen(conf.app.port,'0.0.0.0');
