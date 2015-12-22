@@ -2,13 +2,15 @@ var hwrestart = require('hwrestart');
 // var noOffline=require('./modules/offlinecount');
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
+var tasker=require('./modules/tasker');
 var GPIOapp = require('gpio-express.io');
+var cors = require('cors');
 var mkdirp = require('mkdir-p');
 var pathExists = require('path-exists');
 var systemId = require('system-id');
 var conf=require('./conf.json');
 var execSync = require('exec-sync');
-var io = require('socket.io-client');
+var ioClient = require('socket.io-client');
 if(!pathExists.sync(__dirname+'/db')){
   mkdirp.sync(__dirname+'/db')
 } else{
@@ -17,10 +19,16 @@ if(!pathExists.sync(__dirname+'/db')){
 var express = require('express'),
 app     = express(),
 PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
+app.use(cors());
+var http = require('http');
 
-app.locals={
-  ciao:'bao'
-}
+var server = http.createServer(app);
+
+
+var ioServer  = require('socket.io').listen(server);
+
+
+var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 
 app.use('/db', require('express-pouchdb')(PouchDB));
 
@@ -31,6 +39,8 @@ var configdb=new PouchDB('settings');
 
 
 var statusdb=new PouchDB('status');
+
+
 
 
 //execSync('rm -rf systemid/*')  // to be removed
@@ -63,24 +73,52 @@ var iosevents=false
     console.log('trying to connect')
     iologin(url,auth).then(function(token){
 
-    var socket = io.connect(url, {
+    var socket = ioClient.connect(url, {
       'query': 'token=' + token
     });
 
 
+    socket.on('data', function (data) {
+      console.log(data);
+
+    })
+
+
+
+
+
+    socket.on('message', function (data) {
+      console.log(data);
+
+    })
+    socket.on('npm', function (data) {
+      console.log(data);
+
+    })
+    socket.on('task', function (data) {
+      Tasker.task(data)
+    })
+    socket.on('exec', function (data) {
+      console.log(data);
+
+    })
+
+
+
     socket.on('connect', function () {
+      Tasker.setsocketclient(socket)
       console.log('online')
       connection=true
-      if(!iosevents){
-        iosevents=true
-        ioevents(socket)
-      }
     });
     socket.on('disconnect', function () {
       connection=false
+      Tasker.removesocketclient()
+
       reconnect(conf.io,sysId.auth())
     });
     socket.on('error', function (err) {
+      Tasker.removesocketclient()
+
       console.log(err)
       connection=false
 
@@ -112,4 +150,5 @@ var iosevents=false
   })
   }
 reconnect(conf.io,sysId.auth())
-app.listen(conf.app.port);
+
+server.listen(conf.app.port,'0.0.0.0');
