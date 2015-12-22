@@ -117,6 +117,8 @@ for(var m=0;m<apps.length;m++){
     }
 
     if(appopts.boot){
+
+      setTimeout(function(){
       if (appopts.boot.object){
         rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+'/'+appopts.boot.path,appopts.boot.object).then(function(){
           console.log('boot app '+apps[m])
@@ -134,7 +136,7 @@ for(var m=0;m<apps.length;m++){
 
         })
       }
-
+},2000)
     }
 
 
