@@ -1,6 +1,7 @@
 var hwrestart = require('hwrestart');
 // var noOffline=require('./modules/offlinecount');
 var fs=require('fs');
+var Promise=require('promise');
 
 var iologin=require('./modules/socket/iologin');
 var ioevents=require('./modules/socket/ioevents');
@@ -91,43 +92,111 @@ if(!pathExists.sync(__dirname+'/apps')){
 
 var apps=fs.readdirSync('./apps/modules/')
 for(var m=0;m<apps.length;m++){
-if(pathExists.sync(__dirname+'/apps/modules/'+apps[m]+'/package.json')){
-  var appconf=require(__dirname+'/apps/modules/'+apps[m]+'/package.json')
+  if(pathExists.sync(__dirname+'/apps/modules/'+apps[m]+'/package.json')){
+    var appconf=require(__dirname+'/apps/modules/'+apps[m]+'/package.json')
 
 
 
-console.log('configuring app '+appconf.name)
+    console.log('configuring app '+appconf.name)
 
 
-if(pathExists.sync(__dirname+'/apps/configs/'+apps[m]+'.json')){
-  var appopts=require(__dirname+'/apps/configs/'+apps[m]+'.json')
+    if(pathExists.sync(__dirname+'/apps/configs/'+apps[m]+'.json')){
+      var appopts=require(__dirname+'/apps/configs/'+apps[m]+'.json')
 
-  app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main)(appopts.options));
+      app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main)(appopts.options));
 
-  } else{
-     app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main));
+    } else{
+      app.use('/'+appopts.route, require(__dirname+'/apps/modules/'+apps[m]+'/'+appconf.main));
 
-  }
+    }
 
   }
 }
 
 
+function onlinestatus(url,auth){
+
+  bool=true
+
+  if(!connection){
+    bool=false
+    setTimeout(function(){
+      reconnect(url,auth)
+    },3000)
+
+  }
+
+
+  return new Promise(function(resolve, reject) {
+
+
+
+    var timenow=new Date().getTime();
+
+    var obj={
+      _id:"connection",
+      connected:bool,
+      updatedAt:timenow
+    }
+    statusdb.get(obj._id).then(function(d){
+
+      obj._rev=d._rev
+      if(!bool &&!d.from){
+        obj.from=timenow;
+
+      } else if(d.from<(timenow-10000)){
+        console.log(d.from,(timenow-10000))
+        hwrestart('unplug')
+      }
+
+
+      statusdb.put(obj).then(function(){
+        resolve(obj)
+
+      }).catch(function(err){
+        reject(err)
+      })
+
+
+
+    }).catch(function(e){
+
+      if(e.status==404){
+        if(!bool){
+          obj.from=timenow;
+        }
+
+        statusdb.post(obj).then(function(){
+          resolve(obj)
+
+        }).catch(function(err){
+          reject(err)
+          if(!bool){
+            hwrestart('unplug')
+          }
+        })
+      } else if(!bool){
+        console.log(e)
+        hwrestart('unplug')
+      } else{
+
+        reject(e)
+
+      }
+
+
+    })
 
 
 
 
+  })
 
 
 
+}
 
-
-
-
-
-
-
-
+var firstconnection=false
 var connection=false
 var iosevents=false
 
@@ -173,12 +242,26 @@ function reconnect(url,auth){
       Tasker.setsocketclient(socket)
       console.log('online')
       connection=true
+      firstconnection=true
+      onlinestatus().then(function(d){
+        console.log(d)
+      }).catch(function(err){
+        console.log('online set on db error')
+        console.log(err)
+      })
+
     });
     socket.on('disconnect', function () {
-      connection=false
+
+      onlinestatus(url,auth).then(function(d){
+        console.log(d)
+      }).catch(function(err){
+        console.log('online set on db error')
+        console.log(err)
+      })
+
       Tasker.removesocketclient()
 
-      reconnect(conf.io,sysId.auth())
     });
     socket.on('error', function (err) {
       Tasker.removesocketclient()
@@ -186,31 +269,26 @@ function reconnect(url,auth){
       console.log(err)
       connection=false
 
-      setTimeout(function(){
-        if(!connection){
 
-          console.log('errorrrrrr')
-          reconnect(url,auth)
+      onlinestatus(url,auth).then(function(d){
+        console.log(d)
+      }).catch(function(err){
+        console.log('online set on db error')
+        console.log(err)
+      })
 
-        }
 
-      },5000)
     });
 
   }).catch(function(err){
     console.log('wrooong')
 
-    console.log(err)
-    setTimeout(function(){
-      if(!connection){
-
-        console.log('errorrrrrr')
-        reconnect(url,auth)
-
-      }
-
-    },10000)
-
+    onlinestatus(url,auth).then(function(d){
+      console.log(d)
+    }).catch(function(err){
+      console.log('online set on db error')
+      console.log(err)
+    })
   })
 }
 reconnect(conf.io,sysId.auth())
