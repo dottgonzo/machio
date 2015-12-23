@@ -48,8 +48,8 @@ var Tasker=new tasker('http://127.0.0.1:'+conf.app.port);
 Tasker.setsockethost(ioServer)
 
 
-var settingsdb=new PouchDB('settings');
-var offlinedb=new PouchDB('offline');
+var configdb=new PouchDB('config');
+var offlinedb=false;
 var statusdb=new PouchDB('status');
 
 Tasker.setdb("http://127.0.0.1:"+conf.app.port)
@@ -67,6 +67,43 @@ var sysId=new systemId({path:__dirname+'/systemid',tracker:true});
 
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/html/index.html')
+})
+
+
+app.get('/test', function(req, res) {
+  console.log('test')
+  Tasker.broadcast('test',{tt:'rr'})
+
+
+    res.json({t:'test'})
+  })
+
+app.post('/send', function(req, res) { // invia gli oggetti o li salva se non c'è connessione e li invia dopo
+
+Tasker.send(req.body.task,req.body.data)
+  res.json({t:'test'})
+})
+app.post('/push', function(req, res) { // invia gli oggetti
+
+Tasker.push(req.body)
+
+
+  res.json({t:'test'})
+})
+app.post('/broadcast', function(req, res) { // invia gli oggetti
+
+Tasker.broadcast(req.body.task,req.body.data)
+
+
+  res.json({t:'test'})
+})
+app.post('/save', function(req, res) { // memorizza in locale
+  res.json({t:'test'})
+})
+app.post('/set', function(req, res) { // salva lo status sul db e lo invia
+
+
+
 })
 
 if(pathExists.sync(__dirname+'/systemid/.tracker')){
@@ -100,7 +137,7 @@ var apps=fs.readdirSync('./apps/modules/')
 for(var m=0;m<apps.length;m++){
   if(pathExists.sync(__dirname+'/apps/modules/'+apps[m]+'/package.json')){
     var appconf=require(__dirname+'/apps/modules/'+apps[m]+'/package.json')
-
+var appname=appconf.name
 
 
     console.log('configuring app '+appconf.name)
@@ -117,13 +154,14 @@ for(var m=0;m<apps.length;m++){
     }
 
     if(appopts.boot){
+      setTimeout(function(){
 
       if (appopts.boot.object){
         rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+'/'+appopts.boot.path,appopts.boot.object).then(function(){
           console.log('boot app '+apps[m])
         }).catch(function(err){
           console.log(err)
-                  console.log('error on boot app '+apps[m])
+                  console.log('error on boot app '+appname)
 
         })
       } else {
@@ -131,10 +169,11 @@ for(var m=0;m<apps.length;m++){
           console.log('boot app '+apps[m])
         }).catch(function(err){
           console.log(err)
-                  console.log('error on boot app '+apps[m])
+                  console.log('error on boot app '+appname)
 
         })
       }
+    },2000)
 
     }
 
@@ -229,6 +268,7 @@ function onlinestatus(url,auth){
 var firstconnection=false
 var connection=false
 var iosevents=false
+var socket;
 
 function reconnect(url,auth){
 
@@ -236,7 +276,7 @@ function reconnect(url,auth){
   console.log('trying to connect')
   iologin(url,auth).then(function(token){
 
-    var socket = ioClient.connect(url, {
+    socket = ioClient.connect(url, {
       'query': 'token=' + token
     });
 
@@ -269,6 +309,7 @@ function reconnect(url,auth){
 
 
     socket.on('connect', function () {
+
       Tasker.setsocketclient(socket)
       console.log('online')
       connection=true
