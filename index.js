@@ -52,7 +52,7 @@ var configdb=new PouchDB('config');
 var offlinedb=false;
 var statusdb=new PouchDB('status');
 
-Tasker.setdb("http://127.0.0.1:"+conf.app.port)
+Tasker.setdb("http://127.0.0.1:"+conf.app.port,PouchDB)
 
 //execSync('rm -rf systemid/*')  // to be removed
 
@@ -75,24 +75,24 @@ app.get('/test', function(req, res) {
   Tasker.broadcast('test',{tt:'rr'})
 
 
-    res.json({t:'test'})
-  })
+  res.json({t:'test'})
+})
 
 app.post('/send', function(req, res) { // invia gli oggetti o li salva se non c'è connessione e li invia dopo
 
 Tasker.send(req.body.task,req.body.data)
-  res.json({t:'test'})
+res.json({t:'test'})
 })
 app.post('/push', function(req, res) { // invia gli oggetti
 
-Tasker.push(req.body)
+  Tasker.push(req.body)
 
 
   res.json({t:'test'})
 })
 app.post('/broadcast', function(req, res) { // invia gli oggetti
 
-Tasker.broadcast(req.body.task,req.body.data)
+  Tasker.broadcast(req.body.task,req.body.data)
 
 
   res.json({t:'test'})
@@ -111,9 +111,6 @@ if(pathExists.sync(__dirname+'/systemid/.tracker')){
 } else{
   throw Error('provide tracker first')
 }
-
-
-
 
 
 if(!pathExists.sync(__dirname+'/apps')){
@@ -137,7 +134,7 @@ var apps=fs.readdirSync('./apps/modules/')
 for(var m=0;m<apps.length;m++){
   if(pathExists.sync(__dirname+'/apps/modules/'+apps[m]+'/package.json')){
     var appconf=require(__dirname+'/apps/modules/'+apps[m]+'/package.json')
-var appname=appconf.name
+    var appname=appconf.name
 
 
     console.log('configuring app '+appconf.name)
@@ -156,24 +153,24 @@ var appname=appconf.name
     if(appopts.boot){
       setTimeout(function(){
 
-      if (appopts.boot.object){
-        rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+'/'+appopts.boot.path,appopts.boot.object).then(function(){
-          console.log('boot app '+apps[m])
-        }).catch(function(err){
-          console.log(err)
-                  console.log('error on boot app '+appname)
+        if (appopts.boot.object){
+          rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+'/'+appopts.boot.path,appopts.boot.object).then(function(){
+            console.log('boot app '+apps[m])
+          }).catch(function(err){
+            console.log(err)
+            console.log('error on boot app '+appname)
 
-        })
-      } else {
-        rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+appopts.boot.path).then(function(){
-          console.log('boot app '+apps[m])
-        }).catch(function(err){
-          console.log(err)
-                  console.log('error on boot app '+appname)
+          })
+        } else {
+          rpj.post("http://127.0.0.1:"+conf.app.port+'/'+appopts.route+appopts.boot.path).then(function(){
+            console.log('boot app '+apps[m])
+          }).catch(function(err){
+            console.log(err)
+            console.log('error on boot app '+appname)
 
-        })
-      }
-    },2000)
+          })
+        }
+      },2000)
 
     }
 
@@ -192,6 +189,7 @@ function onlinestatus(url,auth){
     setTimeout(function(){
       reconnect(url,auth)
     },3000)
+    Tasker.setsocketclient(false)
 
   }
 
@@ -331,11 +329,10 @@ function reconnect(url,auth){
         console.log(err)
       })
 
-      Tasker.removesocketclient()
+
 
     });
     socket.on('error', function (err) {
-      Tasker.removesocketclient()
 
       console.log(err)
       connection=false

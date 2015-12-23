@@ -1,5 +1,6 @@
 
 var rpj=require('request-promise-json');
+var couchjsonconf=require('couchjsonconf');
 
 
 
@@ -23,11 +24,13 @@ function Tasker(apphost){
 }
 
 
-Tasker.prototype.save=function(obj){
+Tasker.prototype.save=function(task,obj){
+
+
 
 
 }
-Tasker.prototype.send=function(obj){
+Tasker.prototype.send=function(task,obj){
 
 sendtoserver(this.socketclient,obj)
 
@@ -37,7 +40,7 @@ broadtoclients(this.sockethost,task,obj)
 
 
 }
-Tasker.prototype.setstatus=function(obj){
+Tasker.prototype.setstatus=function(task,obj){
 
 
 }
@@ -47,9 +50,14 @@ sendtoserver(this.socketclient,task,obj)
 broadtoclients(this.socketclient,task,obj)
 
 }
-Tasker.prototype.setdb=function(db){
+Tasker.prototype.setdb=function(pouchdb,db){
 
-this.db=db
+this.db={
+  db:couchjsonconf(db),
+  memo:pouchdb('memo'),
+  config:pouchdb('config'),
+  status:pouchdb(db+'status')
+}
 
 }
 Tasker.prototype.run=function(task,obj){
@@ -82,16 +90,6 @@ reject(err)
 Tasker.prototype.setsockethost=function(socket){
 
   this.sockethost=socket
-
-}
-Tasker.prototype.removesockethost=function(){
-
-  this.sockethost=false
-
-}
-Tasker.prototype.removesocketclient=function(){
-
-  this.socketclient=false
 
 }
 Tasker.prototype.setsocketclient=function(socket){
