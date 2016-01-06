@@ -1,0 +1,81 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "chai/chai.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "assertion-error/assertion-error.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp-concat/gulp-concat.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp-mocha/gulp-mocha.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp-sourcemaps/gulp-sourcemaps.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp-typescript/gulp-typescript.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "chalk/chalk.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp-util/gulp-util.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "node/node.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "through2/through2.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "gulp/gulp.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "orchestrator/orchestrator.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "q/Q.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "vinyl/vinyl.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "bluebird/bluebird.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "cors/cors.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "mime/mime.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "express/express.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "body-parser/body-parser.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "path-exists/path-exists.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "socket.io/socket.io.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    },
+    "socket.io-client/socket.io-client.d.ts": {
+      "commit": "6a6ad7068a177c0d7a8a20830626cb63277191c5"
+    }
+  }
+}

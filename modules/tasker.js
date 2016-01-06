@@ -1,7 +1,9 @@
 
 var rpj=require('request-promise-json');
-var couchjsonconf=require('couchjsonconf');
+var Couchjson=require('couchjsonconf');
 
+
+var couchjsonconf=new Couchjson({hostname:"test"});
 
 
 
@@ -52,12 +54,12 @@ broadtoclients(this.socketclient,task,obj)
 }
 Tasker.prototype.setdb=function(pouchdb,db){
 
-this.db={
-  db:couchjsonconf(db),
-  memo:pouchdb('memo'),
-  config:pouchdb('config'),
-  status:pouchdb(db+'status')
-}
+// this.db={
+//  db:couchjsonconf(db),
+//  memo:pouchdb('memo'),
+//  config:pouchdb('config'),
+//  status:pouchdb(db+'status')
+// }
 
 }
 Tasker.prototype.run=function(task,obj){

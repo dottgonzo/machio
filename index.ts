@@ -1,35 +1,51 @@
-var hwrestart = require('hwrestart');
-var rpj=require('request-promise-json');
+import * as fs from "fs";
+import * as http from "http" ;
+
+import * as Promise from "bluebird";
+import * as  bodyParser from "body-parser";
+
+import * as express from "express";
+
+import * as cors from "cors";
+import * as pathExists from "path-exists";
+
+import * as ioClient from "socket.io-client";
+import * as Io from "socket.io";
+
+let hwrestart = require('hwrestart');
+let systemId = require('system-id');
+
+let rpj=require('request-promise-json');
 
 // var noOffline=require('./modules/offlinecount');
-var fs=require('fs');
-var Promise=require('promise');
-var bodyParser = require('body-parser');
-var iologin=require('./modules/socket/iologin');
-var ioevents=require('./modules/socket/ioevents');
-var tasker=require('./modules/tasker');
-var cors = require('cors');
-var mkdirp = require('mkdir-p');
-var pathExists = require('path-exists');
-var systemId = require('system-id');
-var conf=require('./conf.json');
-var execSync = require('exec-sync');
-var ioClient = require('socket.io-client');
+
+
+
+let iologin=require('./modules/socket/iologin');
+let ioevents=require('./modules/socket/ioevents');
+let tasker=require('./modules/tasker');
+
+let mkdirp = require('mkdir-p');
+
+
+let conf=require('./conf.json');
+let execSync = require('exec-sync');
+
 if(!pathExists.sync(__dirname+'/db')){
   mkdirp.sync(__dirname+'/db')
 } else{
   execSync('rm -rf /db/status/*')
 }
-var express = require('express'),
-app     = express(),
-PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
+
+let app     = express();
+let PouchDB = require('pouchdb').defaults({prefix: './db/',auto_compaction: true});
 app.use(cors());
-var http = require('http');
-
-var server = http.createServer(app);
 
 
-var ioServer  = require('socket.io').listen(server);
+let server = http.createServer(app);
+
+
+let ioServer  = Io.listen(server);
 
 
 
@@ -181,16 +197,19 @@ for(var m=0;m<apps.length;m++){
 
 
 function onlinestatus(url,auth){
+    
 
-  bool=true
+        let bool;
 
   if(!connection){
-    bool=false
+     bool=false;
     setTimeout(function(){
       reconnect(url,auth)
     },3000)
     Tasker.setsocketclient(false)
 
+  } else {
+        bool=true;
   }
 
 
@@ -198,9 +217,9 @@ function onlinestatus(url,auth){
 
 
 
-    var timenow=new Date().getTime();
+    let timenow=new Date().getTime();
 
-    var obj={
+    let obj={
       _id:"connection",
       connected:bool,
       updatedAt:timenow

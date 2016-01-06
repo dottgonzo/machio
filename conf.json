@@ -11,6 +11,6 @@
       }
     ]
   },
-  "io":"http://kernel.online:9090"
+  "io":"https://io.kernel.online"
 
 }
