@@ -1,7 +1,7 @@
 {
 
   "app":{
-    "port":8080,
+    "port":9080,
     "gpioswitch":[
       {
         "pin":17,
@@ -11,6 +11,6 @@
       }
     ]
   },
-  "io":"https://io.kernel.online"
+  "io":"http://kernel.online:99"
 
 }

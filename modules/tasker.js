@@ -1,103 +1,54 @@
-
-var rpj=require('request-promise-json');
-var Couchjson=require('couchjsonconf');
-
-
-var couchjsonconf=new Couchjson({hostname:"test"});
-
-
-
-function sendtoserver(socket){
-  if(socket){
-    socket.emit(obj._id, obj);
-  }
+var rpj = require('request-promise-json');
+var Couchjson = require('couchjsonconf');
+var couchjsonconf = new Couchjson({ hostname: "test" });
+function sendtoserver(socket, task, obj) {
+    if (socket) {
+        socket.emit(obj._id, obj);
+    }
 }
-function broadtoclients(socket,task,obj){
-if(socket){
-  socket.emit(task, obj);
+function broadtoclients(socket, task, obj) {
+    if (socket) {
+        socket.emit(task, obj);
+    }
 }
+function Tasker(apphost) {
+    this.apphost = apphost;
 }
+Tasker.prototype.save = function (task, obj) {
+};
+Tasker.prototype.send = function (task, obj) {
+    sendtoserver(this.socketclient, task, obj);
+};
+Tasker.prototype.broadcast = function (task, obj) {
+    broadtoclients(this.sockethost, task, obj);
+};
+Tasker.prototype.setstatus = function (task, obj) {
+};
+Tasker.prototype.executed = function (task, obj) {
+    sendtoserver(this.socketclient, task, obj);
+    broadtoclients(this.socketclient, task, obj);
+};
+Tasker.prototype.setdb = function (pouchdb, db) {
+};
+Tasker.prototype.run = function (task, obj) {
+    return new Promise(function (resolve, reject) {
+        var socketclient = this.socketclient;
+        var sockethost = this.sockethost;
+        rpj.post(this.apphost + '/' + task, obj).then(function (a) {
+            sendtoserver(socketclient, task, a);
+            broadtoclients(sockethost, task, a);
+            resolve(a);
+        }).catch(function (err) {
+            reject(err);
+        });
+    });
+};
+Tasker.prototype.setsockethost = function (socket) {
+    this.sockethost = socket;
+};
+Tasker.prototype.setsocketclient = function (socket) {
+    this.socketclient = socket;
+};
+module.exports = Tasker;
 
-
-function Tasker(apphost){
-
-  this.apphost=apphost;
-
-}
-
-
-Tasker.prototype.save=function(task,obj){
-
-
-
-
-}
-Tasker.prototype.send=function(task,obj){
-
-sendtoserver(this.socketclient,obj)
-
-}
-Tasker.prototype.broadcast=function(task,obj){
-broadtoclients(this.sockethost,task,obj)
-
-
-}
-Tasker.prototype.setstatus=function(task,obj){
-
-
-}
-Tasker.prototype.executed=function(task,obj){
-
-sendtoserver(this.socketclient,task,obj)
-broadtoclients(this.socketclient,task,obj)
-
-}
-Tasker.prototype.setdb=function(pouchdb,db){
-
-// this.db={
-//  db:couchjsonconf(db),
-//  memo:pouchdb('memo'),
-//  config:pouchdb('config'),
-//  status:pouchdb(db+'status')
-// }
-
-}
-Tasker.prototype.run=function(task,obj){
-// return new Promise(function(resolve, reject) {
-
-
-
-
-var socketclient=this.socketclient;
-var sockethost=this.sockethost;
-
-rpj.post(this.apphost+'/'+task,obj).then(function(a){
-
-
-sendtoserver(socketclient,task,a)
-
-broadtoclients(sockethost,task,a)
-
-
-resolve(a)
-}).catch(function(err){
-
-reject(err)
-
-})
-
-// })
-}
-
-Tasker.prototype.setsockethost=function(socket){
-
-  this.sockethost=socket
-
-}
-Tasker.prototype.setsocketclient=function(socket){
-  this.socketclient=socket;
-
-
-}
-
-module.exports=Tasker
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1vZHVsZXMvdGFza2VyLnRzIl0sIm5hbWVzIjpbInNlbmR0b3NlcnZlciIsImJyb2FkdG9jbGllbnRzIiwiVGFza2VyIl0sIm1hcHBpbmdzIjoiQUFDQSxJQUFNLEdBQUcsR0FBRyxPQUFPLENBQUMsc0JBQXNCLENBQUMsQ0FBQztBQUM1QyxJQUFPLFNBQVMsV0FBUyxlQUFlLENBQUMsQ0FBQztBQUcxQyxJQUFNLGFBQWEsR0FBQyxJQUFJLFNBQVMsQ0FBQyxFQUFDLFFBQVEsRUFBQyxNQUFNLEVBQUMsQ0FBQyxDQUFDO0FBSXJELHNCQUFzQixNQUFNLEVBQUMsSUFBSSxFQUFDLEdBQUc7SUFDbkNBLEVBQUVBLENBQUFBLENBQUNBLE1BQU1BLENBQUNBLENBQUFBLENBQUNBO1FBQ1RBLE1BQU1BLENBQUNBLElBQUlBLENBQUNBLEdBQUdBLENBQUNBLEdBQUdBLEVBQUVBLEdBQUdBLENBQUNBLENBQUNBO0lBQzVCQSxDQUFDQTtBQUNIQSxDQUFDQTtBQUNELHdCQUF3QixNQUFNLEVBQUMsSUFBSSxFQUFDLEdBQUc7SUFDdkNDLEVBQUVBLENBQUFBLENBQUNBLE1BQU1BLENBQUNBLENBQUFBLENBQUNBO1FBQ1RBLE1BQU1BLENBQUNBLElBQUlBLENBQUNBLElBQUlBLEVBQUVBLEdBQUdBLENBQUNBLENBQUNBO0lBQ3pCQSxDQUFDQTtBQUNEQSxDQUFDQTtBQUdELGdCQUFnQixPQUFPO0lBRXJCQyxJQUFJQSxDQUFDQSxPQUFPQSxHQUFDQSxPQUFPQSxDQUFDQTtBQUV2QkEsQ0FBQ0E7QUFHRCxNQUFNLENBQUMsU0FBUyxDQUFDLElBQUksR0FBQyxVQUFTLElBQUksRUFBQyxHQUFHO0FBS3ZDLENBQUMsQ0FBQTtBQUNELE1BQU0sQ0FBQyxTQUFTLENBQUMsSUFBSSxHQUFDLFVBQVMsSUFBSSxFQUFDLEdBQUc7SUFFdkMsWUFBWSxDQUFDLElBQUksQ0FBQyxZQUFZLEVBQUMsSUFBSSxFQUFDLEdBQUcsQ0FBQyxDQUFBO0FBRXhDLENBQUMsQ0FBQTtBQUNELE1BQU0sQ0FBQyxTQUFTLENBQUMsU0FBUyxHQUFDLFVBQVMsSUFBSSxFQUFDLEdBQUc7SUFDNUMsY0FBYyxDQUFDLElBQUksQ0FBQyxVQUFVLEVBQUMsSUFBSSxFQUFDLEdBQUcsQ0FBQyxDQUFBO0FBR3hDLENBQUMsQ0FBQTtBQUNELE1BQU0sQ0FBQyxTQUFTLENBQUMsU0FBUyxHQUFDLFVBQVMsSUFBSSxFQUFDLEdBQUc7QUFHNUMsQ0FBQyxDQUFBO0FBQ0QsTUFBTSxDQUFDLFNBQVMsQ0FBQyxRQUFRLEdBQUMsVUFBUyxJQUFJLEVBQUMsR0FBRztJQUUzQyxZQUFZLENBQUMsSUFBSSxDQUFDLFlBQVksRUFBQyxJQUFJLEVBQUMsR0FBRyxDQUFDLENBQUE7SUFDeEMsY0FBYyxDQUFDLElBQUksQ0FBQyxZQUFZLEVBQUMsSUFBSSxFQUFDLEdBQUcsQ0FBQyxDQUFBO0FBRTFDLENBQUMsQ0FBQTtBQUNELE1BQU0sQ0FBQyxTQUFTLENBQUMsS0FBSyxHQUFDLFVBQVMsT0FBTyxFQUFDLEVBQUU7QUFTMUMsQ0FBQyxDQUFBO0FBQ0QsTUFBTSxDQUFDLFNBQVMsQ0FBQyxHQUFHLEdBQUMsVUFBUyxJQUFJLEVBQUMsR0FBRztJQUNyQyxNQUFNLENBQUMsSUFBSSxPQUFPLENBQUMsVUFBUyxPQUFPLEVBQUUsTUFBTTtRQUs1QyxJQUFJLFlBQVksR0FBQyxJQUFJLENBQUMsWUFBWSxDQUFDO1FBQ25DLElBQUksVUFBVSxHQUFDLElBQUksQ0FBQyxVQUFVLENBQUM7UUFFL0IsR0FBRyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsT0FBTyxHQUFDLEdBQUcsR0FBQyxJQUFJLEVBQUMsR0FBRyxDQUFDLENBQUMsSUFBSSxDQUFDLFVBQVMsQ0FBQztZQUduRCxZQUFZLENBQUMsWUFBWSxFQUFDLElBQUksRUFBQyxDQUFDLENBQUMsQ0FBQTtZQUVqQyxjQUFjLENBQUMsVUFBVSxFQUFDLElBQUksRUFBQyxDQUFDLENBQUMsQ0FBQTtZQUdqQyxPQUFPLENBQUMsQ0FBQyxDQUFDLENBQUE7UUFDVixDQUFDLENBQUMsQ0FBQyxLQUFLLENBQUMsVUFBUyxHQUFHO1lBRXJCLE1BQU0sQ0FBQyxHQUFHLENBQUMsQ0FBQTtRQUVYLENBQUMsQ0FBQyxDQUFBO0lBRUQsQ0FBQyxDQUFDLENBQUE7QUFDSCxDQUFDLENBQUE7QUFFRCxNQUFNLENBQUMsU0FBUyxDQUFDLGFBQWEsR0FBQyxVQUFTLE1BQU07SUFFNUMsSUFBSSxDQUFDLFVBQVUsR0FBQyxNQUFNLENBQUE7QUFFeEIsQ0FBQyxDQUFBO0FBQ0QsTUFBTSxDQUFDLFNBQVMsQ0FBQyxlQUFlLEdBQUMsVUFBUyxNQUFNO0lBQzlDLElBQUksQ0FBQyxZQUFZLEdBQUMsTUFBTSxDQUFDO0FBRzNCLENBQUMsQ0FBQTtBQUVELE1BQU0sQ0FBQyxPQUFPLEdBQUMsTUFBTSxDQUFBIiwiZmlsZSI6Im1vZHVsZXMvdGFza2VyLmpzIiwic291cmNlc0NvbnRlbnQiOlsiXG5jb25zdCBycGogPSByZXF1aXJlKCdyZXF1ZXN0LXByb21pc2UtanNvbicpO1xuaW1wb3J0IENvdWNoanNvbj1yZXF1aXJlKCdjb3VjaGpzb25jb25mJyk7XG5cblxuY29uc3QgY291Y2hqc29uY29uZj1uZXcgQ291Y2hqc29uKHtob3N0bmFtZTpcInRlc3RcIn0pO1xuXG5cblxuZnVuY3Rpb24gc2VuZHRvc2VydmVyKHNvY2tldCx0YXNrLG9iaik6dm9pZHtcbiAgaWYoc29ja2V0KXtcbiAgICBzb2NrZXQuZW1pdChvYmouX2lkLCBvYmopO1xuICB9XG59XG5mdW5jdGlvbiBicm9hZHRvY2xpZW50cyhzb2NrZXQsdGFzayxvYmopOnZvaWR7XG5pZihzb2NrZXQpe1xuICBzb2NrZXQuZW1pdCh0YXNrLCBvYmopO1xufVxufVxuXG5cbmZ1bmN0aW9uIFRhc2tlcihhcHBob3N0KXtcblxuICB0aGlzLmFwcGhvc3Q9YXBwaG9zdDtcblxufVxuXG5cblRhc2tlci5wcm90b3R5cGUuc2F2ZT1mdW5jdGlvbih0YXNrLG9iail7XG5cblxuXG5cbn1cblRhc2tlci5wcm90b3R5cGUuc2VuZD1mdW5jdGlvbih0YXNrLG9iail7XG5cbnNlbmR0b3NlcnZlcih0aGlzLnNvY2tldGNsaWVudCx0YXNrLG9iailcblxufVxuVGFza2VyLnByb3RvdHlwZS5icm9hZGNhc3Q9ZnVuY3Rpb24odGFzayxvYmope1xuYnJvYWR0b2NsaWVudHModGhpcy5zb2NrZXRob3N0LHRhc2ssb2JqKVxuXG5cbn1cblRhc2tlci5wcm90b3R5cGUuc2V0c3RhdHVzPWZ1bmN0aW9uKHRhc2ssb2JqKXtcblxuXG59XG5UYXNrZXIucHJvdG90eXBlLmV4ZWN1dGVkPWZ1bmN0aW9uKHRhc2ssb2JqKXtcblxuc2VuZHRvc2VydmVyKHRoaXMuc29ja2V0Y2xpZW50LHRhc2ssb2JqKVxuYnJvYWR0b2NsaWVudHModGhpcy5zb2NrZXRjbGllbnQsdGFzayxvYmopXG5cbn1cblRhc2tlci5wcm90b3R5cGUuc2V0ZGI9ZnVuY3Rpb24ocG91Y2hkYixkYil7XG5cbi8vIHRoaXMuZGI9e1xuLy8gIGRiOmNvdWNoanNvbmNvbmYoZGIpLFxuLy8gIG1lbW86cG91Y2hkYignbWVtbycpLFxuLy8gIGNvbmZpZzpwb3VjaGRiKCdjb25maWcnKSxcbi8vICBzdGF0dXM6cG91Y2hkYihkYisnc3RhdHVzJylcbi8vIH1cblxufVxuVGFza2VyLnByb3RvdHlwZS5ydW49ZnVuY3Rpb24odGFzayxvYmope1xuIHJldHVybiBuZXcgUHJvbWlzZShmdW5jdGlvbihyZXNvbHZlLCByZWplY3QpIHtcblxuXG5cblxudmFyIHNvY2tldGNsaWVudD10aGlzLnNvY2tldGNsaWVudDtcbnZhciBzb2NrZXRob3N0PXRoaXMuc29ja2V0aG9zdDtcblxucnBqLnBvc3QodGhpcy5hcHBob3N0KycvJyt0YXNrLG9iaikudGhlbihmdW5jdGlvbihhKXtcblxuXG5zZW5kdG9zZXJ2ZXIoc29ja2V0Y2xpZW50LHRhc2ssYSlcblxuYnJvYWR0b2NsaWVudHMoc29ja2V0aG9zdCx0YXNrLGEpXG5cblxucmVzb2x2ZShhKVxufSkuY2F0Y2goZnVuY3Rpb24oZXJyKXtcblxucmVqZWN0KGVycilcblxufSlcblxuIH0pXG59XG5cblRhc2tlci5wcm90b3R5cGUuc2V0c29ja2V0aG9zdD1mdW5jdGlvbihzb2NrZXQpe1xuXG4gIHRoaXMuc29ja2V0aG9zdD1zb2NrZXRcblxufVxuVGFza2VyLnByb3RvdHlwZS5zZXRzb2NrZXRjbGllbnQ9ZnVuY3Rpb24oc29ja2V0KXtcbiAgdGhpcy5zb2NrZXRjbGllbnQ9c29ja2V0O1xuXG5cbn1cblxubW9kdWxlLmV4cG9ydHM9VGFza2VyXG4iXSwic291cmNlUm9vdCI6Ii9zb3VyY2UvIn0=

@@ -1,20 +1,18 @@
-var Promise=require('promise');
+var Promise = require("bluebird");
 var rpj = require('request-promise-json');
+module.exports = function (url, credentials) {
+    return new Promise(function (resolve, reject) {
+        rpj.post(url + '/login', credentials).then(function (a) {
+            if (a.token) {
+                resolve(a.token);
+            }
+            else {
+                reject(a);
+            }
+        }).catch(function (err) {
+            reject(err);
+        });
+    });
+};
 
-
-
-
-module.exports=function(url,credentials){
-return new Promise(function(resolve,reject){
-  rpj.post(url+'/login',credentials).then(function(a){
-
-if(a.token){
-  resolve(a.token)
-} else{
-  reject(a)
-}
-    }).catch(function(err){
-      reject(err)
-    })
-})
-}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm1vZHVsZXMvc29ja2V0L2lvbG9naW4udHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsSUFBWSxPQUFPLFdBQU0sVUFBVSxDQUFDLENBQUE7QUFDcEMsSUFBSSxHQUFHLEdBQUcsT0FBTyxDQUFDLHNCQUFzQixDQUFDLENBQUM7QUFJMUMsaUJBQU8sVUFBUyxHQUFVLEVBQUMsV0FBYztJQUN6QyxNQUFNLENBQUMsSUFBSSxPQUFPLENBQUMsVUFBUyxPQUFPLEVBQUMsTUFBTTtRQUN4QyxHQUFHLENBQUMsSUFBSSxDQUFDLEdBQUcsR0FBQyxRQUFRLEVBQUMsV0FBVyxDQUFDLENBQUMsSUFBSSxDQUFDLFVBQVMsQ0FBQztZQUVwRCxFQUFFLENBQUEsQ0FBQyxDQUFDLENBQUMsS0FBSyxDQUFDLENBQUEsQ0FBQztnQkFDVixPQUFPLENBQUMsQ0FBQyxDQUFDLEtBQUssQ0FBQyxDQUFBO1lBQ2xCLENBQUM7WUFBQyxJQUFJLENBQUEsQ0FBQztnQkFDTCxNQUFNLENBQUMsQ0FBQyxDQUFDLENBQUE7WUFDWCxDQUFDO1FBQ0csQ0FBQyxDQUFDLENBQUMsS0FBSyxDQUFDLFVBQVMsR0FBRztZQUNuQixNQUFNLENBQUMsR0FBRyxDQUFDLENBQUE7UUFDYixDQUFDLENBQUMsQ0FBQTtJQUNOLENBQUMsQ0FBQyxDQUFBO0FBQ0YsQ0FBQyxDQUFBIiwiZmlsZSI6Im1vZHVsZXMvc29ja2V0L2lvbG9naW4uanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgKiBhcyBQcm9taXNlIGZyb20gXCJibHVlYmlyZFwiO1xubGV0IHJwaiA9IHJlcXVpcmUoJ3JlcXVlc3QtcHJvbWlzZS1qc29uJyk7XG5cblxuXG5leHBvcnQ9ZnVuY3Rpb24odXJsOnN0cmluZyxjcmVkZW50aWFsczp7fSl7XG5yZXR1cm4gbmV3IFByb21pc2UoZnVuY3Rpb24ocmVzb2x2ZSxyZWplY3Qpe1xuICBycGoucG9zdCh1cmwrJy9sb2dpbicsY3JlZGVudGlhbHMpLnRoZW4oZnVuY3Rpb24oYSl7XG5cbmlmKGEudG9rZW4pe1xuICByZXNvbHZlKGEudG9rZW4pXG59IGVsc2V7XG4gIHJlamVjdChhKVxufVxuICAgIH0pLmNhdGNoKGZ1bmN0aW9uKGVycil7XG4gICAgICByZWplY3QoZXJyKVxuICAgIH0pXG59KVxufVxuIl0sInNvdXJjZVJvb3QiOiIvc291cmNlLyJ9
