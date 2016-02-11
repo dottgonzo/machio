@@ -21,7 +21,7 @@ const execSync = require('exec-sync');
 const PDB = require('pouchdb');
 const mqtt = require('mqtt');
 
-
+import linetw =require("linetwork");
 
 // var noOffline=require('./modules/offlinecount');
 
@@ -40,7 +40,7 @@ const conf = require('./conf.json');
 if (!pathExists.sync(__dirname + '/db')) {
     mkdirp.sync(__dirname + '/db')
 } else {
-    execSync('rm -rf /db/status/*')
+    execSync('rm -rf '+__dirname +'/db/status/*')
 }
 
 const app = express();
@@ -53,6 +53,7 @@ const server = http.createServer(app);
 
 const ioServer = Io.listen(server);
 
+const Internet = new linetw(conf.network);
 
 
 
@@ -438,18 +439,31 @@ function Connect(url: string, auth: string) {
     }
 }
 
-linetw()
+
+console.log(Internet);
+Internet.init().then(function (status) {
+    console.log("CONNECTED")
+        console.log(status)
+
+
+}).catch(function (err) {
+        console.log("err CONNECTED")
+            console.log(err)
+    
+                hwrestart('unplug')
+
+});
+
+
+
+
+Connect(conf.io, sysId.auth())
 
 timerdaemon.post(5000, function() {
 
     onlinestatus()
 
 })
-
-
-
-Connect(conf.io, sysId.auth())
-
 
 
 

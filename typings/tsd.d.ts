@@ -23,3 +23,6 @@
 /// <reference path="path-exists/path-exists.d.ts" />
 /// <reference path="socket.io/socket.io.d.ts" />
 /// <reference path="socket.io-client/socket.io-client.d.ts" />
+/// <reference path="lodash/lodash.d.ts" />
+/// <reference path="deep-diff/deep-diff.d.ts" />
+/// <reference path="async/async.d.ts" />

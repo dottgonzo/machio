@@ -11,6 +11,23 @@
       }
     ]
   },
-  "io":"http://kernel.online:99"
+  "io":"http://kernel.online:99",
+  "network":{
+    "port": 4000,
+    "hostapd": {
+        "driver": "rtl871xdrv",
+        "ssid": "testttap",
+        "wpa_passphrase": "testpass"
+    },
+    "mobile": {
+        "provider": {
+            "label": "Tre Ricaricabile", "apn": "tre.it", "phone": "*99#", "username": "tre", "password": "tre"
+        },
+        "options": {
+            "retry": false,
+            "ifOffline":true
+        }
+    }
+}
 
 }
